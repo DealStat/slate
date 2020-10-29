@@ -2,240 +2,178 @@
 title: API Reference
 
 language_tabs: # must be one of https://git.io/vQNgJ
-  - shell
-  - ruby
   - python
-  - javascript
+  - shell
 
 toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
   - <a href='https://github.com/slatedocs/slate'>Documentation Powered by Slate</a>
 
-includes:
-  - errors
 
 search: true
-
-code_clipboard: true
 ---
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+DealStat API for Real Estate data extraction
 
-We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
 
-This example API documentation page was created with [Slate](https://github.com/slatedocs/slate). Feel free to edit it and use it as a base for your own API's documentation.
+# PDFs
 
-# Authentication
+## Send document (POST)
 
-> To authorize, use this code:
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
 
 ```python
-import kittn
+import requests
 
-api = kittn.authorize('meowmeowmeow')
+FILE_LOC = '/your/path/<YOUR_FILE_LOC>.pdf'
+file_content = open(FILE_LOC, 'rb')
+
+files = {'file': file_content}
+headers = {'Authorization': 'Bearer YOUR-API-KEY'}
+
+result = requests.post('http://DEALSTAT-API-URL.com/<file_type>', files=files, headers=headers)
+
+print(result)
+
 ```
 
 ```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here" \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-```
-
-> Make sure to replace `meowmeowmeow` with your API key.
-
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
-
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
-
-`Authorization: meowmeowmeow`
-
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
-
-# Kittens
-
-## Get All Kittens
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
-
-```shell
-curl "http://example.com/api/kittens" \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
+curl -i -X 'POST' 'http://DEALSTAT-API-URL.com/<file_type>'
+  -H "Authorization: Bearer Your-API-KEY"
+  -F file=@"/your/path/<YOUR_FILE_LOC>.pdf"
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
+{
+  "success": true,
+  "file_id": "krzmuujooydnmjnpjgepzhifn",
+}
+
 ```
 
-This endpoint retrieves all kittens.
+This endpoint sends document to DealStat for processing
 
 ### HTTP Request
 
-`GET http://example.com/api/kittens`
+<aside class="notice"> Make sure to replace DEALSTAT-API-URL with provided URL </aside>
+
+`POST http://DEALSTAT-API-URL.com/<file_type>`
+
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+file_type | title_deed for property deed, om for offering memorandum
+
+
+### HEADER Parameters
+
+Parameter | Description
+--------- | -----------
+Authorization | Bearer YOUR-API-KEY
+
+<aside class="notice"> Make sure to replace YOUR-API-KEY with provided API KEY </aside>
+
+
+
+### FILE Parameters
+
+Parameter | Description
+--------- | -----------
+file | File content of PDF
+
+## Retrieve information (GET)
+
+```python
+import requests
+
+headers = {'Authorization': 'Bearer YOUR-API-KEY'}
+
+result = requests.get('http://DEALSTAT-API-URL.com/<file_type>?file_id=<FILE-ID>', headers=headers)
+
+print(result)
+
+```
+
+```shell
+curl -i -X 'GET' 'http://DEALSTAT-API-URL.com/title_deed?file_id=<FILE-ID>'
+  -H "Authorization: Bearer Your-API-KEY"
+```
+
+> Property deeds return JSON structured like this:
+
+```json
+{
+  "file_id": "krzmuujooydnmjnpjgepzhifn",
+  "status": "complete",
+  "results": {
+  			 "bp": ["2412", "1504"],
+ 			 "instrument": "101070856",
+ 			 "executed_date":"2017-06-05",
+ 			 "recorded_date": "2017-06-05",
+ 			 "grantor": "Breaux Alexander Murphy",
+ 			 "grantee": "Breaux Alexander Murphy, Trustee of the Breaux Alexander Murphy Trust dated June 5, 2017",
+ 			 "consideration": 10,
+ 			 "legal_description": "UNIT 1B, BUILDING II, SILVER TOWN CONDOMINIUMS, A UTAH\nCONDOMINIUM PROJECT, TOGETHER WITH ITS APPURTENANT\nUNDIVIDED OWNERSHIP INTEREST IN THE COMMON AREAS TO THE\nABOVE MENTIONED UNIT OF SAID SILVER TOWN CONDOMINIUUMS,\nWHICH INTEREST IS ESTABLISHED AND IDENTIFIED IN THE\nCONDOMINIUM DECLARATION, RECORDED AS ENTRY NO. 137917\nAND SURVEY MAP FILED FOR RECORD AS ENTRY NO. 13267 AND AS\nMAY BE AMENDED BY THE FIRST SUPPLEMENTAL RECORD OF\nSURVEY RECORDED AS ENTRY NO. 289073.",
+ 			 "document_type": "GRANT DEED",
+ 			 "accept": true
+ 		}
+}
+
+```
+
+> Offering memorandums return JSON structured like this:
+
+```json
+{
+  "file_id": "krzmuujooydnmjnpjgepzhifn",
+  "status": "complete",
+  "results": {
+			"accept": true,
+			 "confidence": "HIGH",
+			 "cap_rate": 0.0562,
+			 "acquisition_price": 3950000.0,
+			 "property_location": {"address": "320 Macon Street",
+			  "neighborhood": "Bedford-stuyvesant",
+			  "city": "Brooklyn",
+			  "state": "NY",
+			  "lat": 40.6822488,
+			  "lng": -73.938079,
+			  "zip": "11216"},
+			 "property_type": "multifamily",
+			 "broker_email": "dj.johnston@cushwake.com",
+			 "net_operating_income": 222080.0,
+			 "total_square_feet": 6040,
+			 "total_units": 7,
+			 "total_expenses": 32836.0,
+			 "effective_gross_revenue": 254916.0,
+			 "portfolio_type": "no"
+ 		}
+}
+
+```
+
+This endpoint retrieves data extracted from the PDF
+
+### HTTP Request
+
+<aside class="notice"> Make sure to replace DEALSTAT-API-URL with provided URL </aside>
+
+`GET http://DEALSTAT-API-URL.com/<file_type>/file_id=<file_id>`
+
+### URL Parameters
+
+Parameter | Description
+--------- | -----------
+file_type | title_deed for property deed, om for offering memorandum
 
 ### Query Parameters
 
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2" \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
-
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
-
-### HTTP Request
-
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to retrieve
+file_id | File ID returned in preceding POST request
 
-## Delete a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.delete(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2" \
-  -X DELETE \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
-```
-
-> The above command returns JSON structured like this:
-
-```json
-{
-  "id": 2,
-  "deleted" : ":("
-}
-```
-
-This endpoint deletes a specific kitten.
-
-### HTTP Request
-
-`DELETE http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to delete
 
